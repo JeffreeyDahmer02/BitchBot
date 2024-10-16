@@ -681,7 +681,7 @@ Library.Sections.__index = Library.Sections
 			Library:Connection(game:GetService("UserInputService").InputBegan, function(Input)
 				if ColorOutline.Visible and Input.UserInputType == Enum.UserInputType.Touch then
 					if not Library:IsMouseOverFrame(ColorOutline) and not Library:IsMouseOverFrame(Icon) then
-						ColorOutline.Visible = false
+						ColorOutline.Visible = not ColorOutline.Visible
 						parent.ZIndex = 1
 					end
 				end
