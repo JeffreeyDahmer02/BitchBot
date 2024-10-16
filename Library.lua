@@ -49,7 +49,7 @@ end
 
 local Library = {
 		Open = true;
-		Accent = Color3.fromRGB(125, 154, 197);
+		Accent = Color3.fromRGB(255,209,220);
 		Pages = {};
 		Sections = {};
 		Flags = {};
@@ -270,6 +270,9 @@ Library.Sections.__index = Library.Sections
 		end;
 		--
 		function Library:IsMouseOverFrame(Frame)
+			local UserInputService = game:GetService("UserInputService")
+			local mouse = UserInputService:GetMouseLocation()
+
 			local AbsPos, AbsSize = Frame.AbsolutePosition, Frame.AbsoluteSize;
 
 			if mouse.X >= AbsPos.X and mouse.X <= AbsPos.X + AbsSize.X
@@ -447,7 +450,7 @@ Library.Sections.__index = Library.Sections
 
 			local Title = Instance.new("TextLabel")
 			Title.Name = "Title"
-			Title.FontFace = getfontfromindex(2)
+			Title.FontFace = getfontfromindex(3)
 			Title.Text = name
 			Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Title.TextSize = Library.FSize
@@ -780,7 +783,7 @@ Library.Sections.__index = Library.Sections
 
 		local Value = Instance.new("TextLabel")
 		Value.Name = "Value"
-		Value.FontFace = getfontfromindex(2)
+		Value.FontFace = getfontfromindex(3)
 		Value.Text = message
 		Value.TextColor3 = Color3.fromRGB(255, 255, 255)
 		Value.TextSize = Library.FSize
@@ -907,16 +910,14 @@ Library.Sections.__index = Library.Sections
 		local Sections = Library.Sections;
 		--
 		function Library:Window(Options)
-	local Window = {
-		Pages = {};
-		Sections = {};
-		Elements = {};
-		Dragging = { false, UDim2.new(0, 0, 0, 0) };
-		Name = Options.Name or "BitchestBot";
-		Size = Options.Size or UDim2.new(0, 400, 0, 400); -- Ensure Options.Size is applied here
-	};
-			
-			local size = Window.Size
+			local Window = {
+				Pages = {};
+				Sections = {};
+				Elements = {};
+				Dragging = { false, UDim2.new(0, 0, 0, 0) };
+				Name = Options.Name or "Monlith";
+				Size = Options.Size or Vector2.new(450,450)
+			};
 			--
 			local ScreenGui = Instance.new("ScreenGui", game:GetService("RunService"):IsStudio() and game.Players.LocalPlayer.PlayerGui or game.CoreGui)
 			ScreenGui.Name = "ScreenGui"
@@ -930,7 +931,7 @@ Library.Sections.__index = Library.Sections
 			Outline.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 			Outline.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Outline.Position = UDim2.new(0.5, 0, 0.5, 0)
-			Outline.Size = size
+			Outline.Size = UDim2.new(0, Window.Size.X, 0, Window.Size.Y)
 			Library.Holder = Outline
 			Outline.Text = ""
 			Outline.AutoButtonColor = false
@@ -1035,8 +1036,9 @@ Library.Sections.__index = Library.Sections
 
 			local Title = Instance.new("TextLabel")
 			Title.Name = "Title"
-			Title.FontFace = getfontfromindex(2)
+			Title.FontFace = getfontfromindex(3)
 			Title.Text = Window.Name
+			Title.RichText = true
 			Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Title.TextSize = Library.FSize
 			Title.TextStrokeTransparency = 0
@@ -1078,33 +1080,36 @@ Library.Sections.__index = Library.Sections
 				FadeThing = FadeThing
 			}
 
-			-- // Dragging
-			Library:Connection(Outline.MouseButton1Down, function()
-				local Location = game:GetService("UserInputService"):GetMouseLocation()
-				Window.Dragging[1] = true
-				Window.Dragging[2] = UDim2.new(0, Location.X - Outline.AbsolutePosition.X, 0, Location.Y - Outline.AbsolutePosition.Y)
-			end)
-			Library:Connection(game:GetService("UserInputService").InputEnded, function(Input)
-				if Input.UserInputType == Enum.UserInputType.Touch and Window.Dragging[1] then
-					local Location = game:GetService("UserInputService"):GetMouseLocation()
-					Window.Dragging[1] = false
-					Window.Dragging[2] = UDim2.new(0, 0, 0, 0)
-				end
-			end)
-			Library:Connection(game:GetService("UserInputService").InputChanged, function(Input)
-				local Location = game:GetService("UserInputService"):GetMouseLocation()
-				local ActualLocation = nil
+-- // Dragging
+Library:Connection(Outline.InputBegan, function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+        local Location = Input.Position
+        Window.Dragging[1] = true
+        Window.Dragging[2] = UDim2.new(0, Location.X - Outline.AbsolutePosition.X, 0, Location.Y - Outline.AbsolutePosition.Y)
+    end
+end)
 
-				-- Dragging
-				if Window.Dragging[1] then
-					Outline.Position = UDim2.new(
-						0,
-						Location.X - Window.Dragging[2].X.Offset + (Outline.Size.X.Offset * Outline.AnchorPoint.X),
-						0,
-						Location.Y - Window.Dragging[2].Y.Offset + (Outline.Size.Y.Offset * Outline.AnchorPoint.Y)
-					)
-				end
-			end)
+Library:Connection(game:GetService("UserInputService").InputEnded, function(Input)
+    if (Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch) and Window.Dragging[1] then
+        Window.Dragging[1] = false
+        Window.Dragging[2] = UDim2.new(0, 0, 0, 0)
+    end
+end)
+
+Library:Connection(game:GetService("UserInputService").InputChanged, function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
+        local Location = Input.Position
+        if Window.Dragging[1] then
+            Outline.Position = UDim2.new(
+                0,
+                Location.X - Window.Dragging[2].X.Offset + (Outline.Size.X.Offset * Outline.AnchorPoint.X),
+                0,
+                Location.Y - Window.Dragging[2].Y.Offset + (Outline.Size.Y.Offset * Outline.AnchorPoint.Y)
+            )
+        end
+    end
+end)
+
 			Library:Connection(game:GetService("UserInputService").InputBegan, function(Input)
 				if Input.KeyCode == Library.UIKey then
 					Library:SetOpen(not Library.Open)
@@ -1155,7 +1160,7 @@ Library.Sections.__index = Library.Sections
 
 				local Value = Instance.new("TextLabel")
 				Value.Name = "Value"
-				Value.FontFace = getfontfromindex(2)
+				Value.FontFace = getfontfromindex(3)
 				Value.Text = "Keybinds"
 				Value.TextColor3 = Color3.fromRGB(255, 255, 255)
 				Value.TextSize = Library.FSize
@@ -1223,7 +1228,7 @@ Library.Sections.__index = Library.Sections
 					--
 					local NewKey = Instance.new("TextLabel")
 					NewKey.Name = "NewKey"
-					NewKey.FontFace = getfontfromindex(2)
+					NewKey.FontFace = getfontfromindex(3)
 					NewKey.Text = Page .. ": " .. Name
 					NewKey.TextColor3 = Color3.fromRGB(255, 255, 255)
 					NewKey.TextSize = Library.FSize
@@ -1301,7 +1306,7 @@ Library.Sections.__index = Library.Sections
 
 			local TextLabel = Instance.new("TextLabel")
 			TextLabel.Name = "TextLabel"
-			TextLabel.FontFace = getfontfromindex(2)
+			TextLabel.FontFace = getfontfromindex(3)
 			TextLabel.Text = Page.Name
 			TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			TextLabel.TextSize = Library.FSize
@@ -1483,7 +1488,7 @@ Library.Sections.__index = Library.Sections
 
 			local Title = Instance.new("TextLabel")
 			Title.Name = "Title"
-			Title.FontFace = getfontfromindex(2)
+			Title.FontFace = getfontfromindex(3)
 			Title.Text = Section.Name
 			Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Title.TextSize = Library.FSize
@@ -1675,7 +1680,7 @@ Library.Sections.__index = Library.Sections
 
 				local TextLabel = Instance.new("TextLabel")
 				TextLabel.Name = "TextLabel"
-				TextLabel.FontFace = getfontfromindex(2)
+				TextLabel.FontFace = getfontfromindex(3)
 				TextLabel.Text = V
 				TextLabel.TextColor3 = Color3.fromRGB(145,145,145)
 				TextLabel.TextSize = Library.FSize
@@ -1880,7 +1885,7 @@ Library.Sections.__index = Library.Sections
 
 			local Title = Instance.new("TextLabel")
 			Title.Name = "Title"
-			Title.FontFace = getfontfromindex(2)
+			Title.FontFace = getfontfromindex(3)
 			Title.Text = Toggle.Name
 			Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Title.TextSize = Library.FSize
@@ -2031,7 +2036,7 @@ Library.Sections.__index = Library.Sections
 
 				local Value = Instance.new("TextLabel")
 				Value.Name = "Value"
-				Value.FontFace = getfontfromindex(2)
+				Value.FontFace = getfontfromindex(3)
 				Value.Text = "..."
 				Value.TextColor3 = Color3.fromRGB(255, 255, 255)
 				Value.TextSize = Library.FSize
@@ -2072,7 +2077,7 @@ Library.Sections.__index = Library.Sections
 				Hold.BorderSizePixel = 0
 				Hold.Size = UDim2.new(1, 0, 0.333000004, 0)
 				Hold.ZIndex = 2
-				Hold.FontFace = getfontfromindex(2)
+				Hold.FontFace = getfontfromindex(3)
 				Hold.Text = "Hold"
 				Hold.TextColor3 = Keybind.Mode == "Hold" and Color3.fromRGB(255,255,255) or Color3.fromRGB(145,145,145)
 				Hold.TextSize = Library.FSize
@@ -2087,7 +2092,7 @@ Library.Sections.__index = Library.Sections
 				Toggle.Position = UDim2.new(0, 0, 0.333000004, 0)
 				Toggle.Size = UDim2.new(1, 0, 0.333000004, 0)
 				Toggle.ZIndex = 2
-				Toggle.FontFace = getfontfromindex(2)
+				Toggle.FontFace = getfontfromindex(3)
 				Toggle.Text = "Toggle"
 				Toggle.TextColor3 = Keybind.Mode == "Toggle" and Color3.fromRGB(255,255,255) or Color3.fromRGB(145,145,145)
 				Toggle.TextSize = Library.FSize
@@ -2102,7 +2107,7 @@ Library.Sections.__index = Library.Sections
 				Always.Position = UDim2.new(0, 0, 0.666999996, 0)
 				Always.Size = UDim2.new(1, 0, 0.333000004, 0)
 				Always.ZIndex = 2
-				Always.FontFace = getfontfromindex(2)
+				Always.FontFace = getfontfromindex(3)
 				Always.Text = "Always"
 				Always.TextColor3 = Keybind.Mode == "Always" and Color3.fromRGB(255,255,255) or Color3.fromRGB(145,145,145)
 				Always.TextSize = Library.FSize
@@ -2429,7 +2434,7 @@ Library.Sections.__index = Library.Sections
 
 			local Value = Instance.new("TextLabel")
 			Value.Name = "Value"
-			Value.FontFace = getfontfromindex(2)
+			Value.FontFace = getfontfromindex(3)
 			Value.Text = "0"
 			Value.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Value.TextSize = Library.FSize
@@ -2446,7 +2451,7 @@ Library.Sections.__index = Library.Sections
 
 			local Title = Instance.new("TextLabel")
 			Title.Name = "Title"
-			Title.FontFace = getfontfromindex(2)
+			Title.FontFace = getfontfromindex(3)
 			Title.Text = Slider.Name
 			Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Title.TextSize = Library.FSize
@@ -2576,7 +2581,7 @@ Library.Sections.__index = Library.Sections
 			NewList.BackgroundTransparency = 1
 			NewList.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			NewList.BorderSizePixel = 0
-			NewList.Size = UDim2.new(1, 0, 0, 31)
+			NewList.Size = UDim2.new(1, 0, 0, 35)
 			NewList.Parent = Dropdown.Section.Elements.SectionContent
 
 			local ToggleFrame = Instance.new("TextButton")
@@ -2610,7 +2615,7 @@ Library.Sections.__index = Library.Sections
 
 			local Value = Instance.new("TextLabel")
 			Value.Name = "Value"
-			Value.FontFace = getfontfromindex(2)
+			Value.FontFace = getfontfromindex(3)
 			Value.Text = "0"
 			Value.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Value.TextSize = Library.FSize
@@ -2631,7 +2636,7 @@ Library.Sections.__index = Library.Sections
 			ContentOutline.AutomaticCanvasSize = Enum.AutomaticSize.Y
 			ContentOutline.MidImage = "rbxassetid://7783554086"
 			ContentOutline.ScrollBarImageColor3 = Color3.fromRGB(30, 30, 30)
-			ContentOutline.ScrollBarThickness = 1
+			ContentOutline.ScrollBarThickness = 5
 			ContentOutline.TopImage = "rbxassetid://7783554086"
 			ContentOutline.Active = true
 			ContentOutline.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
@@ -2663,7 +2668,7 @@ Library.Sections.__index = Library.Sections
 
 			local Title = Instance.new("TextLabel")
 			Title.Name = "Title"
-			Title.FontFace = getfontfromindex(2)
+			Title.FontFace = getfontfromindex(3)
 			Title.Text = Dropdown.Name
 			Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Title.TextSize = Library.FSize
@@ -2683,14 +2688,6 @@ Library.Sections.__index = Library.Sections
 					NewList.ZIndex = 5
 				else
 					NewList.ZIndex = 1
-				end
-			end)
-			Library:Connection(game:GetService("UserInputService").InputBegan, function(Input)
-				if ContentOutline.Visible and Input.UserInputType == Enum.UserInputType.Touch then
-					if not Library:IsMouseOverFrame(ContentOutline) and not Library:IsMouseOverFrame(ToggleFrame) then
-						ContentOutline.Visible = false
-						NewList.ZIndex = 1
-					end
 				end
 			end)
 			--
@@ -2772,7 +2769,7 @@ Library.Sections.__index = Library.Sections
 
 					local Disabled = Instance.new("TextLabel")
 					Disabled.Name = "Disabled"
-					Disabled.FontFace = getfontfromindex(2)
+					Disabled.FontFace = getfontfromindex(3)
 					Disabled.Text = option
 					Disabled.TextColor3 = Color3.fromRGB(255, 255, 255)
 					Disabled.TextSize = Library.FSize
@@ -2788,7 +2785,7 @@ Library.Sections.__index = Library.Sections
 
 					local Enabled = Library:NewInstance("TextLabel", true)
 					Enabled.Name = "Enabled"
-					Enabled.FontFace = getfontfromindex(2)
+					Enabled.FontFace = getfontfromindex(3)
 					Enabled.Text = option
 					Enabled.TextColor3 = Library.Accent
 					Enabled.TextSize = Library.FSize
@@ -2979,7 +2976,7 @@ Library.Sections.__index = Library.Sections
 
 			local Value = Instance.new("TextLabel")
 			Value.Name = "Value"
-			Value.FontFace = getfontfromindex(2)
+			Value.FontFace = getfontfromindex(3)
 			Value.Text = "..."
 			Value.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Value.TextSize = Library.FSize
@@ -2995,7 +2992,7 @@ Library.Sections.__index = Library.Sections
 
 			local Title = Instance.new("TextLabel")
 			Title.Name = "Title"
-			Title.FontFace = getfontfromindex(2)
+			Title.FontFace = getfontfromindex(3)
 			Title.Text = Keybind.Name
 			Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Title.TextSize = Library.FSize
@@ -3035,7 +3032,7 @@ Library.Sections.__index = Library.Sections
 			Hold.BorderSizePixel = 0
 			Hold.Size = UDim2.new(1, 0, 0.333000004, 0)
 			Hold.ZIndex = 2
-			Hold.FontFace = getfontfromindex(2)
+			Hold.FontFace = getfontfromindex(3)
 			Hold.Text = "Hold"
 			Hold.TextColor3 = Keybind.Mode == "Hold" and Color3.fromRGB(255,255,255) or Color3.fromRGB(145,145,145)
 			Hold.TextSize = Library.FSize
@@ -3050,7 +3047,7 @@ Library.Sections.__index = Library.Sections
 			Toggle.Position = UDim2.new(0, 0, 0.333000004, 0)
 			Toggle.Size = UDim2.new(1, 0, 0.333000004, 0)
 			Toggle.ZIndex = 2
-			Toggle.FontFace = getfontfromindex(2)
+			Toggle.FontFace = getfontfromindex(3)
 			Toggle.Text = "Toggle"
 			Toggle.TextColor3 = Keybind.Mode == "Toggle" and Color3.fromRGB(255,255,255) or Color3.fromRGB(145,145,145)
 			Toggle.TextSize = Library.FSize
@@ -3065,7 +3062,7 @@ Library.Sections.__index = Library.Sections
 			Always.Position = UDim2.new(0, 0, 0.666999996, 0)
 			Always.Size = UDim2.new(1, 0, 0.333000004, 0)
 			Always.ZIndex = 2
-			Always.FontFace = getfontfromindex(2)
+			Always.FontFace = getfontfromindex(3)
 			Always.Text = "Always"
 			Always.TextColor3 = Keybind.Mode == "Always" and Color3.fromRGB(255,255,255) or Color3.fromRGB(145,145,145)
 			Always.TextSize = Library.FSize
@@ -3320,7 +3317,7 @@ Library.Sections.__index = Library.Sections
 
 			local Title = Instance.new("TextLabel")
 			Title.Name = "Title"
-			Title.FontFace = getfontfromindex(2)
+			Title.FontFace = getfontfromindex(3)
 			Title.Text = Colorpicker.Name
 			Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Title.TextSize = Library.FSize
@@ -3487,7 +3484,7 @@ Library.Sections.__index = Library.Sections
 
 			local Value = Instance.new("TextBox")
 			Value.Name = "Value"
-			Value.FontFace = getfontfromindex(2)
+			Value.FontFace = getfontfromindex(3)
 			Value.Text = Textbox.State
 			Value.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Value.TextSize = Library.FSize
@@ -3506,7 +3503,7 @@ Library.Sections.__index = Library.Sections
 
 			local Title = Instance.new("TextLabel")
 			Title.Name = "Title"
-			Title.FontFace = getfontfromindex(2)
+			Title.FontFace = getfontfromindex(3)
 			Title.Text = Textbox.Name ~= nil and Textbox.Name or ""
 			Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Title.TextSize = Library.FSize
@@ -3598,7 +3595,7 @@ Library.Sections.__index = Library.Sections
 
 			local Value = Instance.new("TextLabel")
 			Value.Name = "Value"
-			Value.FontFace = getfontfromindex(2)
+			Value.FontFace = getfontfromindex(3)
 			Value.Text = Button.Name
 			Value.TextColor3 = Color3.fromRGB(255, 255, 255)
 			Value.TextSize = Library.FSize
@@ -3710,7 +3707,7 @@ Library.Sections.__index = Library.Sections
 
 			local FriendLabel = Instance.new("TextLabel")
 			FriendLabel.Name = "FriendLabel"
-			FriendLabel.FontFace = getfontfromindex(2)
+			FriendLabel.FontFace = getfontfromindex(3)
 			FriendLabel.Text = "Friendly"
 			FriendLabel.TextColor3 = Color3.fromRGB(255,255,255)
 			FriendLabel.TextSize = Library.FSize
@@ -3735,7 +3732,7 @@ Library.Sections.__index = Library.Sections
 
 			local Priority = Instance.new("TextButton")
 			Priority.Name = "Priority"
-			Priority.FontFace = getfontfromindex(2)
+			Priority.FontFace = getfontfromindex(3)
 			Priority.Text = ""
 			Priority.TextColor3 = Color3.fromRGB(0, 0, 0)
 			Priority.TextSize = 14
@@ -3747,7 +3744,7 @@ Library.Sections.__index = Library.Sections
 
 			local PriorityLabel = Instance.new("TextLabel")
 			PriorityLabel.Name = "PriorityLabel"
-			PriorityLabel.FontFace = getfontfromindex(2)
+			PriorityLabel.FontFace = getfontfromindex(3)
 			PriorityLabel.Text = "Prioritize"
 			PriorityLabel.TextColor3 = Color3.fromRGB(255,255,255)
 			PriorityLabel.TextSize = Library.FSize
@@ -3761,7 +3758,7 @@ Library.Sections.__index = Library.Sections
 
 			local Teleport = Instance.new("TextButton",Frame)
 			Teleport.Name = "Priority"
-			Teleport.FontFace = getfontfromindex(2)
+			Teleport.FontFace = getfontfromindex(3)
 			Teleport.Text = ""
 			Teleport.TextColor3 = Color3.fromRGB(0, 0, 0)
 			Teleport.TextSize = 14
@@ -3773,7 +3770,7 @@ Library.Sections.__index = Library.Sections
 
 			local TeleportLabel = Instance.new("TextLabel")
 			TeleportLabel.Name = "PriorityLabel"
-			TeleportLabel.FontFace = getfontfromindex(2)
+			TeleportLabel.FontFace = getfontfromindex(3)
 			TeleportLabel.Text = "Go To"
 			TeleportLabel.TextColor3 = Color3.fromRGB(255,255,255)
 			TeleportLabel.TextSize = Library.FSize
@@ -3805,7 +3802,7 @@ Library.Sections.__index = Library.Sections
 
 			local Whip = Instance.new("TextButton",Frame)
 			Whip.Name = "Priority"
-			Whip.FontFace = getfontfromindex(2)
+			Whip.FontFace = getfontfromindex(3)
 			Whip.Text = ""
 			Whip.TextColor3 = Color3.fromRGB(0, 0, 0)
 			Whip.TextSize = 14
@@ -3817,7 +3814,7 @@ Library.Sections.__index = Library.Sections
 
 			local WhipLabel = Instance.new("TextLabel")
 			WhipLabel.Name = "PriorityLabel"
-			WhipLabel.FontFace = getfontfromindex(2)
+			WhipLabel.FontFace = getfontfromindex(3)
 			WhipLabel.Text = "Whip"
 			WhipLabel.TextColor3 = Color3.fromRGB(255,255,255)
 			WhipLabel.TextSize = Library.FSize
@@ -3867,7 +3864,7 @@ Library.Sections.__index = Library.Sections
 
 			local PlayerName1 = Instance.new("TextLabel")
 			PlayerName1.Name = "PlayerName"
-			PlayerName1.FontFace = getfontfromindex(2)
+			PlayerName1.FontFace = getfontfromindex(3)
 			PlayerName1.Text = "No Player Selected"
 			PlayerName1.TextColor3 = Color3.fromRGB(255,255,255)
 			PlayerName1.TextSize = Library.FSize
@@ -3884,7 +3881,7 @@ Library.Sections.__index = Library.Sections
 
 			local SectionName = Instance.new("TextLabel")
 			SectionName.Name = "SectionName"
-			SectionName.FontFace = getfontfromindex(2)
+			SectionName.FontFace = getfontfromindex(3)
 			SectionName.Text = "Player List"
 			SectionName.TextColor3 = Color3.fromRGB(255,255,255)
 			SectionName.TextSize = Library.FSize
@@ -3926,7 +3923,7 @@ Library.Sections.__index = Library.Sections
 
 			local TeamLabel = Instance.new("TextLabel")
 			TeamLabel.Name = "TeamLabel"
-			TeamLabel.FontFace = getfontfromindex(2)
+			TeamLabel.FontFace = getfontfromindex(3)
 			TeamLabel.Text = "Team"
 			TeamLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			TeamLabel.TextSize = Library.FSize
@@ -3942,7 +3939,7 @@ Library.Sections.__index = Library.Sections
 
 			local NameLabel = Instance.new("TextLabel")
 			NameLabel.Name = "NameLabel"
-			NameLabel.FontFace = getfontfromindex(2)
+			NameLabel.FontFace = getfontfromindex(3)
 			NameLabel.Text = "Name"
 			NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			NameLabel.TextSize = Library.FSize
@@ -3958,7 +3955,7 @@ Library.Sections.__index = Library.Sections
 
 			local StatusLabel = Instance.new("TextLabel")
 			StatusLabel.Name = "StatusLabel"
-			StatusLabel.FontFace = getfontfromindex(2)
+			StatusLabel.FontFace = getfontfromindex(3)
 			StatusLabel.Text = "Status"
 			StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			StatusLabel.TextSize = Library.FSize
@@ -4045,7 +4042,7 @@ Library.Sections.__index = Library.Sections
 
 						local PlayerName = Instance.new("TextLabel")
 						PlayerName.Name = "PlayerName"
-						PlayerName.FontFace = getfontfromindex(2)
+						PlayerName.FontFace = getfontfromindex(3)
 						PlayerName.Text = option.Name
 						PlayerName.TextColor3 = Color3.fromRGB(255, 255, 255)
 						PlayerName.TextSize = Library.FSize
@@ -4062,7 +4059,7 @@ Library.Sections.__index = Library.Sections
 
 						local PlayerStatus = Instance.new("TextLabel")
 						PlayerStatus.Name = "PlayerStatus"
-						PlayerStatus.FontFace = getfontfromindex(2)
+						PlayerStatus.FontFace = getfontfromindex(3)
 						PlayerStatus.Text = option == game.Players.LocalPlayer and "Local Player" or table.find(Library.Friends, option) and "Friendly" or table.find(Library.Priorities, option) and "Priority" or "None"
 						PlayerStatus.TextColor3 = option == game.Players.LocalPlayer and Color3.fromRGB(0, 170, 255) or table.find(Library.Friends, option) and Color3.fromRGB(0,255,0) or table.find(Library.Priorities, option) and Color3.fromRGB(255,0,0) or Color3.fromRGB(255,255,255)
 						PlayerStatus.TextSize = Library.FSize
@@ -4078,7 +4075,7 @@ Library.Sections.__index = Library.Sections
 
 						local PlayerAccent = Library:NewInstance("TextLabel", true)
 						PlayerAccent.Name = "PlayerAccent"
-						PlayerAccent.FontFace = getfontfromindex(2)
+						PlayerAccent.FontFace = getfontfromindex(3)
 						PlayerAccent.Text = option.Name
 						PlayerAccent.TextColor3 = Library.Accent
 						PlayerAccent.TextSize = Library.FSize
@@ -4096,7 +4093,7 @@ Library.Sections.__index = Library.Sections
 
 						local PlayerTeam = Instance.new("TextLabel")
 						PlayerTeam.Name = "PlayerTeam"
-						PlayerTeam.FontFace = getfontfromindex(2)
+						PlayerTeam.FontFace = getfontfromindex(3)
 						PlayerTeam.Text = option:FindFirstChild("Team") and tostring(option.Team.Name) or "No Team"
 						PlayerTeam.TextColor3 = option:FindFirstChild("Team") and option.TeamColor.Color or Color3.fromRGB(255,255,255)
 						PlayerTeam.TextSize = Library.FSize
