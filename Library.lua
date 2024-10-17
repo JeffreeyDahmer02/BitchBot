@@ -1,13 +1,32 @@
 local players, run_service, tween_service, workspace, http_service, gui_service, uis, current_list = game:GetService("Players"), game:GetService("RunService"), game:GetService("TweenService"), game:GetService("Workspace"), game:GetService("HttpService"), game:GetService("GuiService"), game:GetService("UserInputService"), {}
-local DrawingFontsEnum = {
-    [0] = Enum.Font.Arial,
+local fontConfig = {
+    name = "Arial",
+    faces = {
+        {
+            name = "Regular",
+            weight = 200,
+            style = "normal",
+        }
+    }
 }
 
-function getfontfromindex(fontIndex)
-    return DrawingFontsEnum[fontIndex] or Enum.Font.Arial
+local jsonConfig = game:GetService("HttpService"):JSONEncode(fontConfig)
+
+if not isfile("Arial.json") then
+    writefile("Arial.json", jsonConfig)
 end
 
 print("waypoint two")
+
+local DrawingFontsEnum = {
+    [0] = Font.new(getcustomasset("Arial.json"), Enum.FontWeight.Regular),
+}
+
+function getfontfromindex(fontIndex)
+    return DrawingFontsEnum[fontIndex] or DrawingFontsEnum[0]
+end
+
+print("waypoint three")
 
 local Library = {
 		Open = true;
