@@ -1,17 +1,13 @@
 local players, run_service, tween_service, workspace, http_service, gui_service, uis, current_list = game:GetService("Players"), game:GetService("RunService"), game:GetService("TweenService"), game:GetService("Workspace"), game:GetService("HttpService"), game:GetService("GuiService"), game:GetService("UserInputService"), {}
-
-
-print("wayponint two")
-
 local DrawingFontsEnum = {
     [0] = Enum.Font.Arial,
 }
 
 function getfontfromindex(fontIndex)
-    return DrawingFontsEnum[fontIndex]
+    return DrawingFontsEnum[fontIndex] or Enum.Font.Arial
 end
 
-
+print("waypoint two")
 
 local Library = {
 		Open = true;
