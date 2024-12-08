@@ -913,6 +913,25 @@ Library.Sections.__index = Library.Sections
 			Library.Holder = Outline
 			Outline.Text = ""
 			Outline.AutoButtonColor = false
+			local Glow = Instance.new("Frame")
+Glow.Name = "Glow"
+Glow.BackgroundTransparency = 1
+Glow.Size = UDim2.new(1, 30, 1, 30)
+Glow.Position = UDim2.new(0.5, 0, 0.5, 0)
+Glow.AnchorPoint = Vector2.new(0.5, 0.5)
+Glow.ZIndex = 0
+
+local GlowEffect = Instance.new("ImageLabel")
+GlowEffect.BackgroundTransparency = 1
+GlowEffect.Image = "rbxassetid://4996891970" 
+GlowEffect.ImageColor3 = Library.Accent
+GlowEffect.Size = UDim2.new(1, 0, 1, 0)
+GlowEffect.ScaleType = Enum.ScaleType.Slice
+GlowEffect.SliceCenter = Rect.new(8, 8, 16, 16)
+GlowEffect.Parent = Glow
+
+Glow.Parent = Outline
+
 
 			local Inline = Instance.new("Frame")
 			Inline.Name = "Inline"
